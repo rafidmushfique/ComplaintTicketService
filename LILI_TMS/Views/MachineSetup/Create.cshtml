@@ -1,0 +1,131 @@
+﻿@model LILI_TMS.Models.TblMachineSetup
+
+
+<div id="modal-placeholder">
+    @{
+        var message = TempData["msg"].ToString();
+        if (!string.IsNullOrEmpty(message))
+        {
+            <script>
+            alert("@message");
+            </script>
+        
+        }
+    }
+
+</div>
+
+
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="breadcrumb-item"><a href="/MachineSetup/Index">Machine Setup Information</a></li>
+        <li class="breadcrumb-item active">Add Machine Setup Information</li>
+        </ol>
+ 
+</section>
+<!-- Main content -->
+<section class="content container-fluid">
+    <!-- Horizontal Form -->
+    <div class="row">
+        <div class="col-12">
+    <div class="card" style="border:1px solid; border-color:cadetblue; padding:10px">
+
+                <form class="form-horizontal" asp-controller="MachineSetup" method="post" asp-action="CreateMachineSetup">
+           
+            <div class="card-body">
+
+
+                <div class="form-group">
+                    <div class="row">
+                                <label for="MachineCode" class="col-sm-2 control-label">Code</label>
+                                <div class="col-sm-3">
+                                     <input type="text" asp-for="MachineCode" class="form-control" placeholder="" readonly>
+                                     <span asp-validation-for="MachineCode"></span>
+                                </div>
+                                <label class="col-sm-2 control-label">Installation Date</label>
+                                <div class="col-md-3">
+                                    <input asp-for="InstallationDate" type="date" asp-format="{0:yyyy-MM-dd}" class="form-control" />
+                                    <span asp-validation-for="InstallationDate" class="text-danger"></span>
+                                </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                                <label for="ToolName" class="col-sm-2 control-label">Machine Name</label>
+                        <div class="col-sm-3">
+                                    <input type="text" asp-for="MachineName" class="form-control" placeholder="Machine Name">
+                                    <span asp-validation-for="MachineName"></span>
+                        </div>
+                        <label for="DepartmentCode" class="col-sm-2 control-label">Department</label>
+                        <div class="col-sm-3">
+
+                            <select asp-for="DepartmentCode" class="form-control" asp-items="@(new SelectList(ViewBag.ListOfDepartment,"DepartmentCode","DepartmentName"))" required></select>
+
+
+                           
+                            <span asp-validation-for="DepartmentCode"></span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <div class="row">
+                        <label for="ModelNumber" class="col-sm-2 control-label">Model No</label>
+                        <div class="col-sm-3">
+                                    <input type="text" asp-for="ModelNumber" class="form-control" placeholder="Model Number">
+                            <span asp-validation-for="ModelNumber"></span>
+                        </div>
+                        <label class="col-sm-2 control-label">Manufacturer</label>
+                        <div class="col-md-3">
+                                    <input asp-for="Manufacturer" type="text" class="form-control" placeholder="Manufacturer" />
+                            <span asp-validation-for="Manufacturer" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                 <div class="form-group">
+                     <div class="row">
+                         <label for="OriginCountry" class="col-sm-2 control-label">Country Of Origin</label>
+                         <div class="col-sm-3">
+                                    <input type="text" asp-for="OriginCountry" class="form-control" placeholder="Country Of Origin">
+                                    <span asp-validation-for="OriginCountry"></span>
+                         </div>
+                     </div>
+                 </div>
+                <div class="form-group">
+                    <div class="row">
+                            <label for="ToolName" class="col-sm-2 control-label">Comments</label>
+                            <div class="col-sm-8">
+                                <textarea asp-for="Comments" class="form-control" placeholder="Comments"></textarea>
+                                <span asp-validation-for="Comments"></span>
+                            </div>
+                    </div>
+               </div>
+            </div>
+
+
+            <!-- /.box-body -->
+            <div class="card-footer">
+
+                        <a class="btn btn-mini btn-primary" href='@Url.Content("/MachineSetup/Index")'>Cancel</a>
+                <button type="submit" class="btn btn-info pull-right">Create</button>
+
+            </div>
+            <!-- /.box-footer -->
+        </form>
+    </div>
+
+    </div>
+    </div>
+    <!-- /.box -->
+</section>
+
+
+<script type="text/javascript">
+
+
+    
+</script>

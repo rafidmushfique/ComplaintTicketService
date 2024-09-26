@@ -1,0 +1,358 @@
+﻿@model LILI_TMS.Models.TblServiceDepartmentTicketAssignment
+<div id="modal-placeholder">
+
+
+</div>
+
+
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="breadcrumb-item"><a href="/ServiceDepartmentTicketAssignment/Index">Service Department Ticket Assignment</a></li>
+        <li class="breadcrumb-item active">Ticket Assignment</li>
+    </ol>
+
+</section>
+<!-- Main content -->
+
+<section class="content container-fluid">
+    <!-- Horizontal Form -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="col-sm-10">
+
+                        <form class="form-horizontal" enctype="multipart/form-data" asp-controller="ServiceDepartmentTicketAssignment" asp-action="CreateAssign" >
+                            <div class="form-group">
+                                <div class="row">
+
+                                    <label for="inputEmail3" class="col-sm-2 control-label">AssignNo</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" asp-for="AssignNo" class="form-control" placeholder="" readonly="readonly">
+                                    </div>
+
+                                    <label for="inputEmail3" class="col-sm-2 control-label">Assign Date</label>
+                                    <div class="col-sm-4">
+                                        <input type="date" asp-for="AssignDate" class="form-control" placeholder="" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+
+                                    <label for="inputEmail3" class="col-sm-2 control-label">Ticket No</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" asp-for="TicketNo" class="form-control" placeholder="" readonly>
+                                    </div>
+
+                                    <label for="inputEmail3" class="col-sm-2 control-label">Ticket Date</label>
+                                    <div class="col-sm-4">
+                                        <input type="date" asp-for="TicketDate" class="form-control" placeholder="" readonly>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <label for="inputEmail3" class="col-sm-2 control-label">Department</label>
+                                    <div class="col-sm-4">
+
+                                        <input type="hidden" asp-for="DepartmentCode" class="form-control" placeholder="" readonly>
+                                        <input type="text" asp-for="DepartmentName" class="form-control" placeholder="" readonly>
+
+                                    
+                                        <span asp-validation-for="DepartmentCode"></span>
+                                    </div>
+
+                                    <label for="inputEmail3" class="col-sm-2 control-label">Complain Type</label>
+                                    <div class="col-sm-4">
+
+                                        <select asp-for="ComplainTypeCode"  class="form-control" asp-items="@(new SelectList(ViewBag.complainTypes,"ComplainTypeCode","ComplainTypeName"))" disabled></select>
+
+                                       
+                                        <span asp-validation-for="ComplainTypeCode"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <label for="inputEmail3" class="col-sm-2 control-label">Problem Details</label>
+                                    <div class="col-sm-4">
+                                        <textarea type="text" asp-for="ComplainDetails" class="form-control" placeholder="" readonly="readonly"></textarea> </>
+                                    </div>
+                                    <label for="inputEmail3" class="col-sm-2 control-label">Machine List</label>
+                                    <div class="col-sm-4">
+                                    @{
+                                        var selectedLine = "<select id='MachineCode' class='form-control' name='MachineCode[]'  multiple='multiple' >";
+                                                @foreach (var item in ViewBag.MachineSetups)
+                                        {
+                                            if (ViewBag.MachineSetups.Count > 0)
+                                            {
+                                                //var selected = ViewBag.SelectedPurchasingGroup.Contains(PurchasingGroup.Id) ? "selected" : "";
+                                                var data = ViewBag.SelectedMachine as List<TblComplainTicketMachineDetail>;
+                                                var selected = data.Any(data => data.MachineCode == @item.MachineCode) ? "selected" : "";
+                                                selectedLine += "<option " + @selected + " value='" + @item.MachineCode + "' >" + @item.MachineName + "</option>";
+                                            }
+
+                                        }
+                                        selectedLine += "</select>";
+                                    }
+                                    @Html.Raw(@selectedLine)
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <label for="inputEmail3" class="col-sm-2 control-label">Comments</label>
+                                    <div class="col-sm-4">
+                                        <textarea type="text" asp-for="Comments" class="form-control" placeholder="" readonly="readonly"></textarea>
+                                    </div>
+                                    <label for="inputEmail3" class="col-sm-2 control-label">Severity evel</label>
+                                    <div class="col-sm-4">
+
+                                        <select asp-for="SeverityLevelCode" class="form-control" asp-items="@(new SelectList(ViewBag.severityLevels,"SeverityLevelCode","SeverityLevelName"))" disabled></select>
+
+                                        </select>
+                                        <span asp-validation-for="SeverityLevelCode"></span>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <label for="inputEmail3" class="col-sm-2 control-label">Approver</label>
+                                    <div class="col-sm-4">
+
+                                        @* <select asp-for="ApproverCode" class="form-control" asp-items="@(new SelectList(ViewBag.ApproverList,"ApproverCode","ApproverName"))" disabled></select>
+
+                                        </select> *@
+
+
+                                        <input type="hidden" asp-for="ApproverCode" class="form-control" placeholder="" readonly>
+                                        <input type="text" asp-for="ApproverName" class="form-control" placeholder="" readonly>
+
+                                        <span asp-validation-for="ApproverCode"></span>
+                                    </div>
+
+                                    <label for="inputEmail3" class="col-sm-2 control-label">Approver Comments</label>
+                                    <div class="col-sm-4">
+                                        <textarea type="text" asp-for="ApproverComments" class="form-control" placeholder="" readonly="readonly"></textarea>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-body">
+
+                                    <div class="col-sm-4 mt-4">
+                                        <table id="htAttachmentDetials" class="table table-bordered">
+                                            <thead class="thead-dark">
+                                                <tr>
+                                                    <th style="text-align:center;width:7%;display:none;"> File Name</th>
+                                                    <th style="text-align:center;width:10%;display:none;">Original File Name</th>
+                                                    <th style="text-align:center;width:10%;display:none;">Document Type</th>
+                                                    <th style="text-align:center;width:10%;display:none;">Location</th>
+                                                    <th style="text-align:center; width:5%">Attached Files</th>
+
+
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tblComplainTicketImageDetail">
+                                                @{
+                                                    var index = 0;
+                                                    var idx = 0;
+                                                    foreach (var item in Model.TblComplainTicketsImageDetails)
+                                                    {
+                                                        index = idx;
+                                                        <tr id="trtblComplainTicketImageDetail_@idx">
+                                                            <td style="display:none"><input name="TblComplainTicketsImageDetails.Index" type="hidden" value=@index></td>
+                                                            <td style="display:none">@item.FileName</td>
+                                                            <td style="display:none">@item.OriginalFileName </td>
+                                                            <td style="display:none">@item.DocumentType</td>
+                                                            <td style="display:none">@item.Location</td>
+                                                            <td style="text-align:left;"> <a href="/Upload/@item.FileName" download="@item.OriginalFileName">@item.OriginalFileName</a></td>
+
+                                                        </tr>
+                                                        idx++;
+                                                    }
+                                                }
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-body">
+
+                              
+                                    <div class="col-sm-12">
+                                   
+                                        <div class="form-group">
+                                            <div class="row">
+
+                                                <label for="inputEmail3" class="col-sm-2 control-label">Department</label>
+                                                <div class="col-sm-4">
+
+                                                    <input type="hidden" asp-for="ServiceDepartmentCode" class="form-control" placeholder="" readonly>
+                                                    <input type="text" asp-for="ServiceDepartmentName" class="form-control" placeholder="" readonly>
+
+                                                    </select>
+                                                    <span asp-validation-for="ServiceDepartmentCode"></span>
+                                                </div>
+
+                                                <label for="inputEmail3" class="col-sm-2 control-label">Assign To</label>
+                                                <div class="col-sm-4">
+                                                    @{
+                                                        
+                                                        var disablecheck = false;
+                                                        if (Model.StatusCode == "Verify" || Model.StatusCode == "Completed")
+                                                        {
+                                                            disablecheck = true;
+
+                                                        }
+                                                    }
+                                        
+                                                    <select asp-for="AssignToCode" class="form-control" asp-items="@(new SelectList(ViewBag.AssignList,"ApproverCode","ApproverName"))" disabled="@disablecheck" required></select>
+                                                  
+                                                   
+                                                    <span asp-validation-for="AssignToCode"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <label for="inputEmail3" class="col-sm-2 control-label">Comments</label>
+                                                <div class="col-sm-8">
+                                                    <textarea type="text" asp-for="AssignerComments" class="form-control" placeholder="" disabled="@disablecheck"></textarea>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="card-footer">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-sm-12 text-center">
+                                            <a class="btn btn-mini btn-primary" href='@Url.Content("/ServiceDepartmentTicketAssignment/Index")'>Cancel</a>
+                                            @{
+                                                var isDisabled = false;
+                                                var display1 = "";
+                                                var display2 = "none";
+                                                if (Model.Iuser != null)
+                                                {
+                                                      if (Model.Iuser != User.Identity.Name)
+                                                        {
+                                                            isDisabled = true;
+
+                                                        }
+                                                
+                                                }
+                                              
+                                                else
+                                                {
+                                                    if (Model.StatusCode == "Verify" || Model.StatusCode == "Completed")
+                                                    {
+                                                        isDisabled = true;
+                                                    }
+                                                }
+                                              
+
+
+
+                                                if (Model.StatusCode == "Verify")
+                                                {
+
+                                                    <button type="button" id="VerifyBtn" class="btn btn-primary">Verify</button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="submit"  class="btn btn-primary" disabled="@isDisabled" >Assign</button>
+                                                  
+                                                }
+
+                                            }
+
+                                           
+
+                                          
+                                        </div>
+
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+                        </form>
+
+
+
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+    </div>
+    <!-- /.box -->
+</section>
+
+
+
+
+<script type="text/javascript">
+      
+        $(document).ready(function () {
+        $('#MachineCode').select2({disabled:'readonly'});
+    });
+
+    $(document).on('click', '#VerifyBtn', function () {
+        var submitButton = $(this);
+        var TicketNo = $("#TicketNo").val();
+        var StatusCode = "Completed";
+        
+        $.ajax({
+            url: '@Url.Action("UpdateComplainTicketStatus", "ServiceDepartmentTicketAssignment")',
+            type: "POST",
+            data: {
+                ticketNo: TicketNo,
+                statusCode: StatusCode
+            },
+            beforeSend: function () {
+
+                submitButton.prop('disabled', true);
+            },
+            success: function (data) {
+
+
+                window.location.href = '@Url.Action("Index", "ServiceDepartmentTicketAssignment")';
+
+
+
+
+            },
+            complete: function () {
+                submitButton.prop('disabled', false);
+            }
+
+        });
+
+    });
+
+</script>

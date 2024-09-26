@@ -1,0 +1,397 @@
+﻿@model TblComplainTicket
+
+<section class="content-header">
+
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="breadcrumb-item"><a href="#">Update Ticket Information</a></li>
+
+    </ol>
+
+</section>
+<!-- Main content -->
+<section class="content container-fluid">
+
+    <div class="card">
+        <div class="card-body">
+            <div class="col-sm-10">
+
+                <form class="form-horizontal" enctype="multipart/form-data" asp-controller="ComplainTicketInfo" asp-action="UpdateTicket" method="post">
+                    <div class="form-group">
+                        <div class="row">
+                            <input type="hidden" asp-for="Id" class="form-control" placeholder="" readonly="readonly">
+                            <label for="inputEmail3" class="col-sm-2 control-label">Ticket No</label>
+                            <div class="col-sm-4">
+                                <input type="text" asp-for="TicketNo" class="form-control" placeholder="" readonly="readonly">
+                            </div>
+
+                            <label for="inputEmail3" class="col-sm-2 control-label">Ticket Date</label>
+                            <div class="col-sm-4">
+                                <input type="date" asp-for="TicketDate" class="form-control" placeholder="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <label for="inputEmail3" class="col-sm-2 control-label">Department</label>
+                            <div class="col-sm-4">
+                                <select class="form-control" asp-for="DepartmentCode" onchange="GetDepartmentWiseApprovers()">
+                                    @foreach (var item in ViewBag.DepartmentList)
+                                    {
+                                        <option value="@item.DepartmentCode">@item.DepartmentName</option>
+                                    }
+                                </select>
+                            </div>
+                            <label for="inputEmail3" class="col-sm-2 control-label">Complain Type</label>
+                            <div class="col-sm-4">
+                                <select class="form-control" asp-for="ComplainTypeCode">
+                                    @foreach (var item in ViewBag.ComplainTypes)
+                                    {
+                                        <option value="@item.ComplainTypeCode">@item.ComplainTypeName</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <label for="inputEmail3" class="col-sm-2 control-label">Severity Level</label>
+                            <div class="col-sm-4">
+                                <select class="form-control" asp-for="SeverityLevelCode">
+                                    @foreach (var item in ViewBag.SeverityLevels)
+                                    {
+                                        <option value="@item.SeverityLevelCode">@item.SeverityLevelName</option>
+                                    }
+                                </select>
+                            </div>
+                            <label for="inputEmail3" class="col-sm-2 control-label">Machine List</label>
+                            <div class="col-sm-4">
+                               @*  <select class="form-control" multiple asp-for="MachineCode">
+                                    @foreach (var item in ViewBag.MachineSetups)
+                                    {
+                                        <option value="@item.MachineCode">@item.MachineName</option>
+                                    }
+                                </select> *@
+
+                                @{
+                                    var selectedLine = "<select id='MachineCode' class='form-control' name='MachineCode[]' multiple='multiple'>";
+                                    @foreach (var item in ViewBag.MachineSetups)
+                                    {
+                                        if (ViewBag.MachineSetups.Count > 0)
+                                        {
+                                            //var selected = ViewBag.SelectedPurchasingGroup.Contains(PurchasingGroup.Id) ? "selected" : "";
+                                            var data = ViewBag.SelectedMachine as List<TblComplainTicketMachineDetail>;
+                                            var selected = data.Any(data => data.MachineCode == @item.MachineCode) ? "selected" : "";
+                                            selectedLine += "<option " + @selected + " value='" + @item.MachineCode + "' >" + @item.MachineName + "</option>";
+                                        }
+
+                                    }
+                                    selectedLine += "</select>";
+                                }
+                                @Html.Raw(@selectedLine)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <label for="inputEmail3" class="col-sm-2 control-label">Problem Details</label>
+                            <div class="col-sm-4">
+                                <textarea type="text" asp-for="ComplainDetails" class="form-control" placeholder=""></textarea></>
+                            </div>
+                            <label for="inputEmail3" class="col-sm-2 control-label">Comments</label>
+                            <div class="col-sm-4">
+                                <textarea type="text" asp-for="Comments" class="form-control" placeholder=""></textarea>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                             @if (ViewBag.EditPerm == 1)
+                                    {
+                            <div class="col-sm-10">
+
+                                <label for="" class="col-sm-2 control-label text-right">Attachment</label>
+                                <div class="col-sm-4">
+                                    <input type="file" id="Attachment" class="form-control" />
+                                </div>
+                                <div class="col-sm-2">
+                                   
+                                        <button type="button" onclick="Upload()" class="btn btn-sm btn-primary">Add</button>
+                                    
+                                    
+                                
+                                </div>
+                            </div>
+                            }
+                            <div class="col-sm-5 mt-4">
+                                <table id="htAttachmentDetials" class="table table-bordered">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th style="text-align:center;width:7%;display:none;"> File Name</th>
+                                            <th style="text-align:center;width:10%;display:none;">Original File Name</th>
+                                            <th style="text-align:center;width:10%;display:none;">Document Type</th>
+                                            <th style="text-align:center;width:10%;display:none;">Location</th>
+                                            <th style="text-align:center; width:5%">Files</th>
+                                            <th style="text-align:center;width:0.5%">Action</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblComplainTicketImageDetail">
+                                        @{
+                                            var idx = 0;
+                                            var editPerm = @ViewBag.EditPerm;
+                                            foreach (var item in Model.TblComplainTicketsImageDetails)
+                                            {
+                                                var index = idx;
+                                                <tr id="trtblComplainTicketImageDetail_@idx">
+                                                <td style="display:none"><input name="TblComplainTicketsImageDetails.Index" type="hidden" value=@index></td>
+                                                    <td style="display:none">@Html.EditorFor(modelItem => modelItem.TblComplainTicketsImageDetails[idx].FileName, new { htmlAttributes = new { @id = "TblComplainTicketsImageDetails_" + idx + "_FileName" } })</td>
+                                                    <td style="display:none">@Html.EditorFor(modelItem => modelItem.TblComplainTicketsImageDetails[idx].OriginalFileName, new { htmlAttributes = new { @id = "TblComplainTicketsImageDetails_" + idx + "_OriginalFileName" } }) </td>
+                                                    <td style="display:none">@Html.EditorFor(modelItem => modelItem.TblComplainTicketsImageDetails[idx].DocumentType, new { htmlAttributes = new { @id = "TblComplainTicketsImageDetails_" + idx + "_DocumentType" } }) </td>
+                                                    <td style="display:none">@Html.EditorFor(modelItem => modelItem.TblComplainTicketsImageDetails[idx].Location, new { htmlAttributes = new { @id = "TblComplainTicketsImageDetails_" + idx + "_Location" } })</td>
+                                                    <td style="text-align:left;"> <a href="/Upload/@item.FileName" download="@item.OriginalFileName">@item.OriginalFileName</a></td>
+                                                   @if(editPerm ==1)
+                                                    {
+                                                        <td style="text-align: center;"><input id="addRowToTable" type="button" class="btn btn-sm btn-danger" value="Remove" onclick="removeRowItem(@index);"></td>
+                                                    }
+                                                </tr>
+                                                idx++;
+                                            }
+                                        }
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="col-sm-12 mt-4">
+                                <table id="htApporverData" class="table table-bordered">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th style="text-align:center;width:7%;"> Approver Id</th>
+                                            <th style="text-align:center;width:10%;">Approver Name</th>
+                                            <th style="text-align:center;width:10%;">Department</th>
+                                            <th style="text-align:center;width:10%;">Designation</th>
+                                            <th style="text-align:center; width:10%">Contact No</th>
+                                            <th style="text-align:center;width:5%">Send SMS</th>
+
+
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblApporverBodyData">
+                                        @{
+                                            var indx = 0;
+                                            foreach (var item in Model.TblComplainTicketsApproverSmsdetails)
+                                            {
+                                                var check = "";
+                                                var index1 = indx;
+                                                <tr>
+                                                    <td>@Html.EditorFor(modelItem => modelItem.TblComplainTicketsApproverSmsdetails[indx].ApproverCode, new { htmlAttributes = new { @readonly = "readonly", @id = "TblComplainTicketsApproverSmsdetails_" + indx + "_ApproverCode" } })</td>
+                                                    <td>@Html.EditorFor(modelItem => modelItem.TblComplainTicketsApproverSmsdetails[indx].ApproverName, new { htmlAttributes = new { @readonly = "readonly", @id = "TblComplainTicketsApproverSmsdetails_" + indx + "_ApproverName" } })</td>
+                                                    <td>@Html.EditorFor(modelItem => modelItem.TblComplainTicketsApproverSmsdetails[indx].Department, new { htmlAttributes = new { @readonly = "readonly", @id = "TblComplainTicketsApproverSmsdetails_" + indx + "_Department" } })</td>
+                                                    <td>@Html.EditorFor(modelItem => modelItem.TblComplainTicketsApproverSmsdetails[indx].Designation, new { htmlAttributes = new { @readonly = "readonly", @id = "TblComplainTicketsApproverSmsdetails_" + indx + "_Designation" } })</td>
+                                                    <td>@Html.EditorFor(modelItem => modelItem.TblComplainTicketsApproverSmsdetails[indx].Smsto, new { htmlAttributes = new { @readonly = "readonly", @id = "TblComplainTicketsApproverSmsdetails_" + indx + "_Smsto" } })</td>
+                                                    @if (@item.IsSmsreceiver)
+                                                    {
+                                                         check = "checked";
+                                                    }
+                                                     <td>
+                                                        @Html.EditorFor(modelItem => modelItem.TblComplainTicketsApproverSmsdetails[indx].IsSmsreceiver, new { htmlAttributes = new { @id = "TblComplainTicketsApproverSmsdetails_" + indx + "_IsSmsreceiver" ,@onchange = "checkboxSetValue(this)" } })
+
+                                                    </td>
+
+                                                </tr>
+                                                indx++;
+                                            }
+                                        }
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-sm-12 text-left">
+                                    <a class="btn btn-mini btn-primary" href='@Url.Content("/ComplainTicketInfo/Index")'>Cancel</a>
+                                    @if (ViewBag.EditPerm == 1)
+                                    {
+                                        <button type="submit" class="btn btn-primary">Save</button>
+                                    }
+                                  
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                </form>
+
+
+
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- /.box-body -->
+    </div>
+
+    </div>
+    <!-- /.row -->
+</section>
+<script src="~/AdminLTE-3.2.0/plugins/jquery/jquery.min.js"></script>
+<script>
+
+    $(document).ready(function () {
+        $('#MachineCode').select2();
+    });
+
+    function Delete(id) {
+        //alert(id)
+        var txt;
+        var r = confirm("Are you sure you want to Delete?");
+        if (r == true) {
+
+            $.ajax(
+                {
+                    type: "POST",
+                    url: '@Url.Action("Delete", "ReceiveAttachement")',
+                    data: {
+                        vId: id
+                    },
+                    error: function (result) {
+                        alert("error");
+                    },
+                    success: function (result) {
+                        if (result == true) {
+                            var baseUrl = "/Index";
+                            alert("Delete Succesful.");
+                            window.location.reload();
+                        }
+                        else {
+                            alert("Can't delete, May have data dependency !");
+                        }
+
+                    }
+                });
+        }
+    }
+    function Upload() {
+        var formData = new FormData();
+        formData.append('file', $('#Attachment')[0].files[0]);
+
+        $.ajax({
+            url: '@Url.Action("UploadFile", "ComplainTicketInfo")', // Replace with your controller action URL
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (elem) {
+                console.log(elem);
+                var table = $("#htAttachmentDetials tbody");
+                // $.each(result, function (idx, elem) {
+
+                var index = $("#tblComplainTicketImageDetail").children("tr").length;
+                var indexCell = "<td style='display:none'><input name='TblComplainTicketsImageDetails.Index' type='hidden' value='" + index + "' /></td>";
+                var fileNameCell = "<td style='display:none'> <input type='text' class='calFileName' style='text-align:right; width:100%' id='TblComplainTicketsImageDetails_" + index + "_FileName' name='TblComplainTicketsImageDetails[" + index + "].FileName' value='" + elem.filename + "'/> </td>";
+                var orginalFileNameCell = "<td style='display:none'> <input type='text' class='calOriginalFileName' style='text-align:right; width:100%' id='TblComplainTicketsImageDetails_" + index + "_OriginalFileName' name='TblComplainTicketsImageDetails[" + index + "].OriginalFileName' value='" + elem.originalFileName + "'/></td>";
+                var documentTypeCell = "<td style='display:none'> <input type='text' class='calDocumentType' style='text-align:right; width:100%' id='TblComplainTicketsImageDetails_" + index + "_DocumentType' name='TblComplainTicketsImageDetails[" + index + "].DocumentType' value='" + elem.extension + "'/></td>";
+                var locationCell = "<td style='display:none'> <input type='text' class='calLocation' style='text-align:right; width:100%' id='TblComplainTicketsImageDetails_" + index + "_Location' name='TblComplainTicketsImageDetails[" + index + "].Location' value='" + elem.fileLocation + "'/></td>";
+                var fileCell = "<td> <a href='/Upload/" + elem.filename + "';download='" + elem.originalFileName + "'>" + elem.originalFileName + "</a></td>"
+                var removeCell = "<td style='text-align: center;'><input id='addRowToTable' type='button' class='btn btn-sm btn-danger'value='Remove' onclick='removeRowItem(" + index + ");' /></td>";
+
+                var newRow = "<tr id='trtblComplainTicketImageDetail" + index + "'>" + indexCell + fileNameCell + orginalFileNameCell + documentTypeCell + locationCell + fileCell + removeCell + "</tr>";
+
+                table.append(newRow);
+                // });
+            },
+            error: function (error) {
+                console.log(error.responseText);
+            }
+        });
+    }
+    function removeRowItem(id) {
+        var controlToBeRemoved = "#trtblComplainTicketImageDetail_" + id;
+        var deleteLocation = $("#TblComplainTicketsImageDetails_" + id + "_Location");
+        var filepath = deleteLocation.val();
+        console.log(filepath);
+
+        //alert(controlToBeRemoved);
+        $(controlToBeRemoved).remove();
+
+    }
+    function checkboxSetValue(e) {
+        var row = e.id.split("_");
+        var rowId = $("#" + row[0] + "_" + row[1] + "_IsSmsreceiver")
+        if ($(e).is(':checked')) {
+
+            rowId.val(true);
+        }
+        else {
+            rowId.val(false);
+        }
+        // var checkbox = $('#TblComplainTicketsApproverSmsdetails_' + index + '_SendSms');
+
+    }
+    function GetDepartmentWiseApprovers() {
+        var table = $("#htApporverData tbody");
+        table.empty();
+        var departmetCode = $("#DepartmentCode").val();
+        var date = new Date();
+        var DateNow = date.getDate();
+        $.ajax({
+            url: '@Url.Action("GetApproverDetials", "ComplainTicketInfo")', // Replace with your controller action URL
+            type: 'POST',
+            data: {
+                DepartmentCode: departmetCode,
+            },
+            success: function (result) {
+                console.log(result);
+               
+                $.each(result, function (idx, elem) {
+
+                    var index = $("#TblComplainTicketsImageDetails").children("tr").length;
+                    var indexCell = "<td style='display:none'><input name='TblComplainTicketsApproverSmsdetails.Index' type='hidden' value='" + index + "' /></td>";
+
+                    var approverId = "<td> <input type='text' class='calApproverId' style='text-align:right; width:100%' id='TblComplainTicketsApproverSmsdetails_" + index + "_ApproverCode' name='TblComplainTicketsApproverSmsdetails[" + index + "].ApproverCode' value='" + elem.employeeCode + "'/> </td>";
+                    var approverName = "<td> <input type='text' class='calApproverName' style='text-align:right; width:100%' id='TblComplainTicketsApproverSmsdetails_" + index + "_ApproverName'  value='" + elem.employeeName + "'/> </td>";
+                    var department = "<td> <input type='text' class='calDepartment' style='text-align:right; width:100%' id='TblComplainTicketsApproverSmsdetails_" + index + "_Department'  value='" + elem.departmentName + "'/> </td>";
+                    var designation = "<td> <input type='text' class='calDesignation' style='text-align:right; width:100%' id='TblComplainTicketsApproverSmsdetails_" + index + "_Designation'  value='" + elem.designationName + "'/> </td>";
+                    var contactNo = "<td> <input type='text' class='calContactNo' style='text-align:right; width:100%' id='TblComplainTicketsApproverSmsdetails_" + index + "_ContactNo' name='TblComplainTicketsApproverSmsdetails[" + index + "].SMSTo' value='" + elem.contactNo + "'/> </td>";
+
+                    var sendSms = "<td style='display:none'> <input type='hidden' class='calSendSms' style='text-align:right; width:100%' id='TblComplainTicketsApproverSmsdetails_" + index + "_IsSMSReceiver' name='TblComplainTicketsApproverSmsdetails[" + index + "].IsSMSReceiver' value='" + elem.isSmsreceiver + "'/> </td>";
+                    var check = "";
+                    if (elem.isSmsreceiver) {
+                        check = "checked"
+                    }
+                    var sendSmsCheckbox = "<td >  <input type='checkbox' class='calSendSmsChck'" + check + " style = 'text-align:right; width:100%' id = 'TblComplainTicketsApproverSmsdetails_" + index + "_SendSmschk' onchange = 'checkboxSetValue(this)' /> </td>";
+
+                    var removeCell = "<td style='text-align: center;'><input id='addRowToTable' type='button' class='btn btn-danger' value='Remove' onclick='removeRowItem(" + index + ");' /></td>";
+
+                    var newRow = "<tr id='trTblComplainTicketApproverSMSDetail" + index + "'>" + indexCell + approverId + approverName + department + designation + contactNo + sendSms + sendSmsCheckbox  + "</tr>";
+
+                    table.append(newRow);
+                });
+            },
+            error: function (error) {
+                console.log(error.responseText);
+            }
+        });
+    }
+</script>
+
+
+
+

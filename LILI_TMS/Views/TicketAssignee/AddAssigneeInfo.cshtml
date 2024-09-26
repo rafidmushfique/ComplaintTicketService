@@ -1,0 +1,594 @@
+﻿@* @model TblTicketAssigneeInfo *@
+@model TblComplainTicket
+
+<section class="content-header">
+
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="breadcrumb-item"><a href="#">Update Ticket Information</a></li>
+
+    </ol>
+
+</section>
+<!-- Main content -->
+
+<section class="content container-fluid">
+
+    <div class="card">
+        <div class="card-body">
+            <div class="col-sm-10">
+
+                <form class="form-horizontal" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <div class="row">
+                            <input type="hidden" asp-for="Id" class="form-control" placeholder="" readonly="readonly">
+                            <label for="inputEmail3" class="col-sm-2 control-label">Job No</label>
+                            <div class="col-sm-4">
+                                <input type="text" asp-for="JobNo" class="form-control" placeholder="" readonly="readonly">
+                            </div>
+
+                            <label for="inputEmail3" class="col-sm-2 control-label">Job Date</label>
+                            <div class="col-sm-4">
+                                <input type="date" asp-for="JobDate" class="form-control" placeholder="" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <input type="hidden" asp-for="Id" class="form-control" placeholder="" readonly="readonly">
+                            <label for="inputEmail3" class="col-sm-2 control-label">Ticket No</label>
+                            <div class="col-sm-4">
+                                <input type="text" asp-for="TicketNo" class="form-control" placeholder="" readonly="readonly">
+                            </div>
+
+                            <label for="inputEmail3" class="col-sm-2 control-label">Ticket Date</label>
+                            <div class="col-sm-4">
+                                <input type="date" asp-for="TicketDate" class="form-control" placeholder="" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <label for="inputEmail3" class="col-sm-2 control-label">Department</label>
+                            <div class="col-sm-4">
+                                <input type="hidden" asp-for="DepartmentCode" class="form-control" readonly/>
+                                <input type="text" asp-for="DepartmentName" class="form-control" readonly />
+                            </div>
+                            <label for="inputEmail3" class="col-sm-2 control-label">Complain Type</label>
+                            <div class="col-sm-4">
+                                <select class="form-control" asp-for="ComplainTypeCode" disabled>
+                                    @foreach (var item in ViewBag.ComplainTypes)
+                                    {
+                                        <option value="@item.ComplainTypeCode">@item.ComplainTypeName</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <label for="inputEmail3" class="col-sm-2 control-label">Severity Level</label>
+                            <div class="col-sm-4">
+                                <select class="form-control" asp-for="SeverityLevelCode" disabled>
+                                    @foreach (var item in ViewBag.SeverityLevels)
+                                    {
+                                        <option value="@item.SeverityLevelCode">@item.SeverityLevelName</option>
+                                    }
+                                </select>
+                            </div>
+                            <label for="inputEmail3" class="col-sm-2 control-label">Machine List</label>
+                            <div class="col-sm-4">
+                               @*  <select class="form-control" multiple asp-for="MachineCode">
+                                    @foreach (var item in ViewBag.MachineSetups)
+                                    {
+                                        <option value="@item.MachineCode">@item.MachineName</option>
+                                    }
+                                </select> *@
+
+                                @{
+                                    var selectedLine = "<select id='MachineCode' class='form-control' name='MachineCode[]' multiple='multiple' disabled>";
+                                                                                                                @foreach (var item in ViewBag.MachineSetups)
+                                    {
+                                        if (ViewBag.MachineSetups.Count > 0)
+                                        {
+                                            //var selected = ViewBag.SelectedPurchasingGroup.Contains(PurchasingGroup.Id) ? "selected" : "";
+                                            var data = ViewBag.SelectedMachine as List<TblComplainTicketMachineDetail>;
+                                            var selected = data.Any(data => data.MachineCode == @item.MachineCode) ? "selected" : "";
+                                            selectedLine += "<option " + @selected + " value='" + @item.MachineCode + "' >" + @item.MachineName + "</option>";
+                                        }
+
+                                    }
+                                    selectedLine += "</select>";
+                                }
+                                @Html.Raw(@selectedLine)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <label for="inputEmail3" class="col-sm-2 control-label">Problem Details</label>
+                            <div class="col-sm-4">
+                                <textarea type="text" asp-for="ComplainDetails" class="form-control" placeholder="" readonly></textarea></st>
+                            </div>
+                            <label for="inputEmail3" class="col-sm-2 control-label">Comments</label>
+                            <div class="col-sm-4">
+                                <textarea type="text" asp-for="Comments" class="form-control" placeholder="" readonly></textarea>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                       
+                            <div class="col-sm-4 mt-4">
+                                <table id="htAttachmentDetials" class="table table-bordered">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th style="text-align:center;width:7%;display:none;"> File Name</th>
+                                            <th style="text-align:center;width:10%;display:none;">Original File Name</th>
+                                            <th style="text-align:center;width:10%;display:none;">Document Type</th>
+                                            <th style="text-align:center;width:10%;display:none;">Location</th>
+                                            <th style="text-align:center; width:5%">Attached Files</th>
+                                          
+
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblComplainTicketImageDetail">
+                                        @{
+                                           
+                                            var idx = 0;
+                                            foreach (var item in Model.TblComplainTicketsImageDetails)
+                                            {
+                                                  
+                                                 <tr id="trtblComplainTicketImageDetail_@idx">
+                                                    <td style="display:none"><input name="TblComplainTicketsImageDetails.Index" type="hidden" value=@idx></td>
+                                                     <td style="display:none">@Html.EditorFor(modelItem => modelItem.TblComplainTicketsImageDetails[idx].FileName, new { htmlAttributes = new { @id = "TblComplainTicketsImageDetails_" + idx + "_FileName" } })</td>
+                                                     <td style="display:none">@Html.EditorFor(modelItem => modelItem.TblComplainTicketsImageDetails[idx].OriginalFileName, new { htmlAttributes = new { @id = "TblComplainTicketsImageDetails_" + idx + "_OriginalFileName" } }) </td>
+                                                     <td style="display:none">@Html.EditorFor(modelItem => modelItem.TblComplainTicketsImageDetails[idx].DocumentType, new { htmlAttributes = new { @id = "TblComplainTicketsImageDetails_" + idx + "_DocumentType" } }) </td>
+                                                     <td style="display:none">@Html.EditorFor(modelItem => modelItem.TblComplainTicketsImageDetails[idx].Location, new { htmlAttributes = new { @id = "TblComplainTicketsImageDetails_" + idx + "_Location" } })</td>
+                                                     <td style="text-align:left;"> <a href="/Upload/@item.FileName" download="@item.OriginalFileName">@item.OriginalFileName</a></td>
+                                                    
+                                                 </tr>
+                                                idx++;
+                                            }
+                                        }
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                  
+                
+
+                </form>
+
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="col-sm-10">
+                            <label for="inputEmail3" class="col-sm-2 control-label"> Job Executed By</label>
+
+
+                            <div class="col-sm-4">
+                                @if (string.IsNullOrEmpty(Model.JobExecutedBy))
+                                {
+
+                                    <select class="form-control" id="JobExecutedByCode">
+
+                                        @foreach (var item in ViewBag.AssignList)
+                                        {
+
+                                            <option value="@item.EmployeeCode">@item.EmployeeName</option>
+                                        }
+
+                                    </select>
+                                }
+                                else
+                                {
+                                    <input type="text" class="form-control" value="@Model.JobExecutedBy" readonly/>
+
+                                }
+
+                            </div>
+                        
+                         </div>
+
+                        <div class="col-sm-10 mt-4">
+                            <label for="inputEmail3" class="col-sm-2 control-label"> Parts</label>
+                            <div class="col-sm-4">
+
+                                <select class="form-control" id="PartsCode" >
+                                    @foreach (var item in ViewBag.LisOfParts)
+                                    {
+                                        <option value="@item.PartsCode">@item.PartsName</option>
+                                    }
+                                </select>
+                            </div>
+                            <label for="inputEmail3" class="col-sm-2 control-label"> Quantity</label>
+                            <div class="col-sm-3">
+                                <input type="text" id="Quantity" class="form-control" value="0" onkeypress='return isNumberKey(event)' />
+                            </div>
+                            <button type="button" class="btn btn-sm btn-primary" onclick="addNewRow()">Add</button>
+                        </div>
+                        <div class="col-sm-10 mt-4">
+
+                             
+                            <table id="htPartDetailData" class="table table-bordered">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th style="text-align:center;width:7%;"> Parts Code</th>
+                                        <th style="text-align:center;width:10%;">Parts Name</th>
+                                        <th style="text-align:center;width:2%;">Quantity</th>
+                                        <th style="text-align:center;width:0.5%;">Action</th>
+                                      
+                                    </tr>
+                                </thead>
+                                <tbody id="tblPartBodyData">
+                                    @if (Model.TblTicketAssigneeInfoPartsDetails != null)
+                                    {
+                                        foreach (var item in Model.TblTicketAssigneeInfoPartsDetails)
+                                        {
+                                             <tr>
+                                             <td>
+                                                    <input type="text" class="form-control" value="@item.PartsCode" readonly/>
+                                             </td>
+                                             <td>  <input type="text" class="form-control" value="@item.PartsName" readonly/></td>
+                                             <td>  <input type="text" class="form-control" value="@item.Quantity" readonly/></td>
+                                             <td></td>
+                                             </tr>
+                                        }
+
+                                    }
+                                </tbody>
+
+                            </table>
+
+
+                        </div>
+                        <div class="col-sm-10 mt-4">
+                            <label for="inputEmail3" class="col-sm-2 control-label"> Status</label>
+                            <div class="col-sm-4">
+
+                                <select class="form-control" id="StatusCode">
+                                    <option value="">-Select Status-</option>
+                                    <option value="Verify">Completed</option>
+                                    <option value="Hold">Hold</option>
+                                    <option value="Irreparable">Irreparable</option>
+                                </select>
+                            </div>
+                            <label for="inputEmail3" class="col-sm-2 control-label"> Comments</label>
+                            <div class="col-sm-4">
+                                <textarea type="text"  id="Comments" class="form-control"></textarea>
+                            </div>
+                          
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="col-sm-12 mt-4">
+                            <table id="htApporverData" class="table table-bordered">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th style="text-align:center;width:7%;"> Approver Id</th>
+                                        <th style="text-align:center;width:10%;">Approver Name</th>
+                                        <th style="text-align:center;width:10%;">Department</th>
+                                        <th style="text-align:center;width:10%;">Designation</th>
+                                        <th style="text-align:center; width:10%">Contact No</th>
+                                        <th style="text-align:center;width:5%">Send SMS</th>
+
+
+                                    </tr>
+                                </thead>
+                                <tbody id="tblApproverBody">
+                               
+                                @{
+                                    var index = 0;
+                                    foreach (var item in Model.ApproverInfoViewModel)
+                                    {
+                                        var trid = "tblApproverBody" + @index;
+                                                                                                                 <tr id="@trid">
+                                                                                                            <td><input type="text" class="calApproverId form-control" readonly="readonly" value="@item.ApproverId" /></td>
+                                                                                                            <td><input type="text" class="calApproverName form-control" readonly="readonly" value="@item.ApproverName" /></td>
+                                                                                                            <td><input type="text" class="calDepartment form-control" readonly="readonly" value="@item.Department" /></td>
+                                                                                                            <td><input type="text" class="calDesignation form-control" readonly="readonly" value="@item.Designation" /></td>
+                                                                                                            <td><input type="text" class="calContactNo form-control" readonly="readonly" value="@item.ContactNo" /></td>
+                                                                                                                @{
+                                                                                var check = "";
+                                                                                var value = "false";
+                                                                                var checkboxid = "checkId_" + @index;
+                                                                                if (@item.SendSms)
+                                                                                {
+                                                                                    check = "checked";
+                                                                                    value = "true";
+                                                                                }
+                                                                                                                }
+
+                                                                                                                <td><input type="checkbox" id="@checkboxid" onchange="checkboxSetValue(this)" class="calSendSms" readonly="readonly" value="@value" @check /></td>
+                                                                                                            </tr>
+
+                                    }
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+
+          
+        </div>
+        <div class="card-footer">
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-sm-10 text-center">
+                        <a class="btn btn-mini btn-primary" href='@Url.Content("/TicketAssignee/Index")'>Cancel</a>
+                        @{
+                            var disable = "";
+                            if (Model.StatusCode != "Assigned")
+                            {
+                                
+                             disable="disabled";
+                            }
+                        }
+                        <button type="button" id="SubmitBtn" class="btn btn-primary" @disable>Save</button>
+                    </div>
+
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <!-- /.box-body -->
+    </div>
+
+    </div>
+    <!-- /.row -->
+</section>
+<script src="~/AdminLTE-3.2.0/plugins/jquery/jquery.min.js"></script>
+<script>
+
+    $(document).ready(function () {
+        $('#MachineCode').select2();
+    });
+
+    function addNewRow() { 
+        var PartsCode = $("#PartsCode").val();
+        debugger;
+        if (PartsCode == null || PartsCode == "") {
+            alert("Please Select a Parts");
+        }
+        else {
+            var PartsName = $("#PartsCode option:selected").text();
+            var Quantity = $("#Quantity").val();
+            var $tbody = $("#tblPartBodyData");
+            var count = 0;
+            $("#tblPartBodyData tr").each(function () {
+                var $row = $(this);
+                var PartCode = $row.find(".calPartsCode").val();
+                if (PartCode == PartsCode) {
+                    count++;
+
+                }
+            });
+            if (count > 0) {
+                alert("Parts Already Exists in table");
+            }
+            else {
+                var index = $tbody.children("tr").length;
+                var indexCell = "<td style='display:none'><input name='TblTicketAssigneeInfoPartsDetails.Index' type='hidden' value='" + index + "' /></td>";
+                var partsCodeCell = "<td><input style='width:100%' class='form-control calPartsCode' readonly type='text' value='" + PartsCode + "' /></td>";
+                var partsNameCell = "<td><input style='width:100%' class='form-control calPartsName' readonly type='text' value='" + PartsName + "' /></td>";
+                var quantityCell = "<td><input style='width:100%' class='form-control calQuantity text-right' readonly type='text' value='" + Quantity + "' /></td>";
+                var removeCell = "<td><input id='addRow' type='button'class='btn btn-sm btn-danger' value='Remove' onclick='removeRow(" + index + ");' /></td>";
+
+                var newRow = "<tr id='tblPartBodyData" + index + "'>" + indexCell + partsCodeCell + partsNameCell + quantityCell + removeCell + "</tr>";
+                $tbody.append(newRow);
+                $("#Quantity").val(0);
+            }
+        }
+       
+      
+    }
+    function removeRow(id) {
+        var controlToBeRemoved = "#tblPartBodyData" + id;
+        //alert(controlToBeRemoved);
+        $(controlToBeRemoved).remove();
+    }
+    function Delete(id) {
+        //alert(id)
+        var txt;
+        var r = confirm("Are you sure you want to Delete?");
+        if (r == true) {
+
+            $.ajax(
+                {
+                    type: "POST",
+                    url: '@Url.Action("Delete", "ReceiveAttachement")',
+                    data: {
+                        vId: id
+                    },
+                    error: function (result) {
+                        alert("error");
+                    },
+                    success: function (result) {
+                        if (result == true) {
+                            var baseUrl = "/Index";
+                            alert("Delete Succesful.");
+                            window.location.reload();
+                        }
+                        else {
+                            alert("Can't delete, May have data dependency !");
+                        }
+
+                    }
+                });
+        }
+    }
+    function Upload() {
+        var formData = new FormData();
+        formData.append('file', $('#Attachment')[0].files[0]);
+
+        $.ajax({
+            url: '@Url.Action("UploadFile", "ComplainTicketInfo")', // Replace with your controller action URL
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (elem) {
+                console.log(elem);
+                var table = $("#htAttachmentDetials tbody");
+                // $.each(result, function (idx, elem) {
+
+                var index = $("#tblComplainTicketImageDetail").children("tr").length;
+                var indexCell = "<td style='display:none'><input name='TblComplainTicketsImageDetails.Index' type='hidden' value='" + index + "' /></td>";
+                var fileNameCell = "<td style='display:none'> <input type='text' class='calFileName' style='text-align:right; width:100%' id='TblComplainTicketsImageDetails_" + index + "_FileName' name='TblComplainTicketsImageDetails[" + index + "].FileName' value='" + elem.filename + "'/> </td>";
+                var orginalFileNameCell = "<td style='display:none'> <input type='text' class='calOriginalFileName' style='text-align:right; width:100%' id='TblComplainTicketsImageDetails_" + index + "_OriginalFileName' name='TblComplainTicketsImageDetails[" + index + "].OriginalFileName' value='" + elem.originalFileName + "'/></td>";
+                var documentTypeCell = "<td style='display:none'> <input type='text' class='calDocumentType' style='text-align:right; width:100%' id='TblComplainTicketsImageDetails_" + index + "_DocumentType' name='TblComplainTicketsImageDetails[" + index + "].DocumentType' value='" + elem.extension + "'/></td>";
+                var locationCell = "<td style='display:none'> <input type='text' class='calLocation' style='text-align:right; width:100%' id='TblComplainTicketsImageDetails_" + index + "_Location' name='TblComplainTicketsImageDetails[" + index + "].Location' value='" + elem.fileLocation + "'/></td>";
+                var fileCell = "<td> <a href='/Upload/" + elem.filename + "';download='" + elem.originalFileName + "'>" + elem.originalFileName + "</a></td>"
+                var removeCell = "<td style='text-align: center;'><input id='addRowToTable' type='button' class='btn btn-sm btn-danger'value='Remove' onclick='removeRowItem(" + index + ");' /></td>";
+
+                var newRow = "<tr id='trtblComplainTicketImageDetail" + index + "'>" + indexCell + fileNameCell + orginalFileNameCell + documentTypeCell + locationCell + fileCell + removeCell + "</tr>";
+
+                table.append(newRow);
+                // });
+            },
+            error: function (error) {
+                console.log(error.responseText);
+            }
+        });
+    }
+    function removeRowItem(id) {
+        var controlToBeRemoved = "#trtblComplainTicketImageDetail_" + id;
+        var deleteLocation = $("#TblComplainTicketsImageDetails_" + id + "_Location");
+        var filepath = deleteLocation.val();
+        console.log(filepath);
+
+        //alert(controlToBeRemoved);
+        $(controlToBeRemoved).remove();
+
+    }
+    function checkboxSetValue(e) {
+        var row = e.id;
+        var rowId = $("#" + row);
+        if ($(e).is(':checked')) {
+
+            rowId.val(true);
+        }
+        else {
+            rowId.val(false);
+        }
+
+    }
+   
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+        if (charCode > 31 && (charCode != 46 && (charCode < 48 || charCode > 57)))
+            return false;
+        return true;
+    }
+
+    $(document).on('click', '#SubmitBtn', function () {
+        var submitButton = $(this);
+        var JobNo = $("#JobNo").val();
+        var JobDate = $("#JobDate").val();
+        var TicketNo = $("#TicketNo").val();
+        var JobExecuteByCode = $("#JobExecutedByCode").val();
+        var StatusCode = $("#StatusCode").val();
+        var Comments = $("#Comments").val();
+
+        var TblTicketAssigneeInfos = {};
+        var TblTicketAssigneeInfoPartsDetails = [];
+        var TblTicketAssigneeInfoSmsdetails = [];
+
+        TblTicketAssigneeInfos.JobNo = JobNo;
+        TblTicketAssigneeInfos.JobDate = JobDate;
+        TblTicketAssigneeInfos.TicketNo = TicketNo;
+        TblTicketAssigneeInfos.JobExecutedByCode = JobExecuteByCode;
+        TblTicketAssigneeInfos.StatusCode = StatusCode;
+        TblTicketAssigneeInfos.Comments = Comments;
+
+        $("#tblPartBodyData tr").each(function () {
+            var $row = $(this);
+            var PartCode = $row.find(".calPartsCode").val();
+            var PartName = $row.find(".calPartsName").val();
+            var Quantity = $row.find(".calQuantity").val();
+            var Unit = "PCs"
+            var tblPartsDetailModel = {
+                JobNo : JobNo,
+                TicketNo : TicketNo,
+                PartsCode: PartCode,
+                Quantity: Quantity
+            };
+            console.log(tblPartsDetailModel);
+            TblTicketAssigneeInfoPartsDetails.push(tblPartsDetailModel);
+        });
+
+
+        $("#tblApproverBody tr").each(function () {
+            var $row = $(this);
+         
+            var ApproverId = $row.find(".calApproverId").val();
+            var TicketNo = $("#TicketNo").val();
+            var ContactNo = $row.find(".calContactNo").val();
+            var IsSmsreceiver = $row.find(".calSendSms").val();
+            var tblApprovalDetailModel = {
+                JobNo: JobNo,
+                TicketNo: TicketNo,
+                ApproverCode: ApproverId,
+                Smsto: ContactNo,
+                Smsmessage: "",
+                Try: 0,
+                Status: "",
+                SentDate: null,
+                ReceiveId: null,
+                ReceiveDate: null,
+                ReplyMessage: "",
+                IsSmsreceiver: IsSmsreceiver
+            };
+            console.log(tblApprovalDetailModel);
+            TblTicketAssigneeInfoSmsdetails.push(tblApprovalDetailModel);
+        })
+
+        TblTicketAssigneeInfos.TblTicketAssigneeInfoPartsDetails = TblTicketAssigneeInfoPartsDetails;
+        TblTicketAssigneeInfos.TblTicketAssigneeInfoSmsdetails = TblTicketAssigneeInfoSmsdetails;
+       
+        
+        $.ajax({
+            url: '@Url.Action("CreateAssigneeInfo", "TicketAssignee")',
+            type: "POST",
+            data: TblTicketAssigneeInfos,
+            beforeSend: function () {
+
+                submitButton.prop('disabled', true);
+            },
+            success: function (data) {
+
+
+                window.location.href = '@Url.Action("Index", "TicketAssignee")';
+
+
+
+
+            },
+            complete: function () {
+                submitButton.prop('disabled', false);
+            }
+
+        });
+
+
+    });
+</script>
+
+
+
+

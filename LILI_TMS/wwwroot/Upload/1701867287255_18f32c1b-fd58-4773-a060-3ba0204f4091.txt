@@ -1,0 +1,26 @@
+                                        @{ int i = 0;
+                                            foreach (var item in Model.TblExpenseBillDetailBusines.ToList())
+                                            {
+                                                var index = i;
+                                                var total = 0;
+                                                <tr>
+                                                    <td style="display:none"><input name='tblExpenseBillDetailBusiness.Index' type="hidden" value=@index /></td>
+                                                    <td style="display:none">@Html.DisplayFor(modelItem => modelItem.TblExpenseBillDetailBusines[i].Id, new { @id = "Id_" + i, @readonly = "readonly" })</td>
+
+                                                    <td style="display:none">@Html.EditorFor(modelItem => modelItem.TblExpenseBillDetailBusines[i].BusinessCode, new { @id = "BusinessCode_" + i })</td>
+                                                    <td>@Html.DisplayFor(modelItem => modelItem.TblExpenseBillDetailBusines[i].BusinessName, new { @id = "BusinessName_" + i })</td>
+
+                                                    <td style="display:none">@Html.EditorFor(modelItem => modelItem.TblExpenseBillDetailBusines[i].SubCategoryCode, new { @id = "SubCategoryCode_" + i })</td>
+                                                    <td>@Html.DisplayFor(modelItem => modelItem.TblExpenseBillDetailBusines[i].SubCategoryName, new { @id = "SubCategoryName_" + i })</td>
+
+                                                    <td>@Html.EditorFor(modelItem => modelItem.TblExpenseBillDetailBusines[i].Narration, new { @id = "Narration_" + i })</td>
+                                                    <td>@Html.EditorFor(modelItem => modelItem.TblExpenseBillDetailBusines[i].StichallanNo, new { @id = "StichallanNo_" + i })</td>
+                                                    <td>@Html.EditorFor(modelItem => modelItem.TblExpenseBillDetailBusines[i].BillAmount, new { @id = "BillAmount_" + i })</td>
+
+                                                    <td><input type='files' class='form-control' name='TblExpenseBillDetailBusines[@i].Attachments' value=""></td>
+                                                    
+                                                    <td><input class="btn btn-sm btn-danger" type="button" value="Remove" onClick="$(this).closest('tr').remove();"></td>
+                                                </tr>
+                                                i++;
+                                            }
+                                        }

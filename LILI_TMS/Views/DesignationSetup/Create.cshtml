@@ -1,0 +1,108 @@
+﻿@model LILI_TMS.Models.TblDesignation
+
+
+<div id="modal-placeholder">
+    @{
+        var message = TempData["msg"].ToString();
+        if (!string.IsNullOrEmpty(message))
+        {
+            <script>
+            alert("@message");
+            </script>
+        
+        }
+    }
+
+</div>
+
+
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="breadcrumb-item"><a href="/DesignationSetup/Index">Designation Setup Information</a></li>
+        <li class="breadcrumb-item active">Add Designation Setup Information</li>
+        </ol>
+ 
+</section>
+<!-- Main content -->
+<section class="content container-fluid">
+    <!-- Horizontal Form -->
+    <div class="row">
+        <div class="col-12">
+    <div class="card" style="border:1px solid; border-color:cadetblue; padding:10px">
+
+                <form class="form-horizontal" asp-controller="DesignationSetup" method="post" asp-action="CreateDesignationSetup">
+           
+            <div class="card-body">
+
+
+                <div class="form-group">
+                    <div class="form-outline">
+                                <label for="ToolCode" class="col-sm-2 control-label">Code</label>
+                        <div class="col-sm-4">
+                                    <input type="text" asp-for="DesignationCode" class="form-control" placeholder="" readonly>
+                                    <span asp-validation-for="DesignationCode"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-outline">
+                                <label for="ToolName" class="col-sm-2 control-label">Designation Name</label>
+                        <div class="col-sm-10">
+                            <input type="text" asp-for="DesignationName" class="form-control" placeholder="" >
+                                    <span asp-validation-for="DesignationName"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                            <label for="TypeCode" class="col-sm-2 control-label">Department</label>
+                    <div class="col-sm-10">
+
+                                <select asp-for="DepartmentCode" class="form-control" asp-items="@(new SelectList(ViewBag.ListOfDepartment,"DepartmentCode","DepartmentName"))" required></select>
+
+
+                        </select>
+                                <span asp-validation-for="DepartmentCode"></span>
+                    </div>
+
+                 </div>
+
+                <div class="form-group">
+                <div class="form-outline">
+                        <label for="ToolName" class="col-sm-2 control-label">Comments</label>
+                        <div class="col-sm-10">
+                            <textarea asp-for="Comments" class="form-control" placeholder="Comments"></textarea>
+                            <span asp-validation-for="Comments"></span>
+                </div>
+                </div>
+               </div>
+            </div>
+
+
+            <!-- /.box-body -->
+            <div class="card-footer">
+
+                        <a class="btn btn-mini btn-primary" href='@Url.Content("/DesignationSetup/Index")'>Cancel</a>
+                <button type="submit" class="btn btn-info pull-right">Create</button>
+
+            </div>
+            <!-- /.box-footer -->
+        </form>
+    </div>
+
+    </div>
+    </div>
+    <!-- /.box -->
+</section>
+
+
+
+
+<script type="text/javascript">
+
+
+    
+</script>
