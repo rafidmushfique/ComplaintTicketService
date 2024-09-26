@@ -1,0 +1,2 @@
+The Maintenance Ticket System offers a user-friendly interface for submitting maintenance requests, allowing users to easily create tickets with detailed descriptions. The system includes a departmental approval workflow to ensure that all tickets are reviewed before being forwarded to the service team.
+ Users benefit from real-time tracking, enabling them to monitor ticket status throughout the process, and dynamic reporting tools provide insights into common issues and response times.
